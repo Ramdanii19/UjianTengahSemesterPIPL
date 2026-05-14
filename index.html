@@ -7,9 +7,531 @@
     <link rel="stylesheet" href="./src/output.css">
 </head>
 <script>
-    
+
 </script>
-<body>
-    <h1 class="text-amber-200">Hello, Tailwind CSS!</h1>
+<body class="bg-[#f5f7fb] text-gray-700 font-sans">
+
+  <!-- Navbar -->
+
+  <header class="bg-white border-b">
+
+    <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+
+      <h1 class="text-lg font-semibold">SecureCheckout</h1>
+
+      <nav class="hidden md:flex gap-10 text-sm text-gray-500">
+
+        <a href="#" class="hover:text-blue-600">Shop</a>
+
+        <a href="#" class="hover:text-blue-600">Categories</a>
+
+        <a href="#" class="hover:text-blue-600">Offers</a>
+
+      </nav>
+
+      <div class="flex items-center gap-4 text-xl">
+
+        <span>🛒</span>
+
+        <span>👤</span>
+
+      </div>
+
+    </div>
+
+  </header>
+
+  <!-- Main -->
+
+  <main class="max-w-7xl mx-auto px-6 py-10">
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+      <!-- Left Content -->
+
+      <div class="lg:col-span-2">
+
+        <!-- Step -->
+
+        <div class="flex items-center gap-4 mb-8 text-sm">
+
+          <div class="flex items-center gap-2">
+
+            <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">
+
+              1
+
+            </div>
+
+            <span class="text-blue-600 font-medium">Pengiriman</span>
+
+          </div>
+
+          <div class="w-14 h-[1px] bg-gray-300"></div>
+
+          <div class="flex items-center gap-2">
+
+            <div class="w-7 h-7 rounded-full border flex items-center justify-center text-xs">
+
+              2
+
+            </div>
+
+            <span>Pembayaran</span>
+
+          </div>
+
+          <div class="w-14 h-[1px] bg-gray-300"></div>
+
+          <div class="flex items-center gap-2">
+
+            <div class="w-7 h-7 rounded-full border flex items-center justify-center text-xs">
+
+              3
+
+            </div>
+
+            <span>Konfirmasi</span>
+
+          </div>
+
+        </div>
+
+        <!-- Form -->
+
+        <div class="bg-white border rounded-xl p-6">
+
+          <h2 class="font-semibold mb-6">Informasi Pesanan</h2>
+
+          <div class="grid md:grid-cols-2 gap-5">
+
+            <div>
+
+              <label class="text-sm mb-2 block">Nama Pelanggan</label>
+
+              <input
+
+                type="text"
+
+                placeholder="Masukkan nama lengkap"
+
+                class="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+
+              />
+
+            </div>
+
+            <div>
+
+              <label class="text-sm mb-2 block">Total Belanja (Rp)</label>
+
+              <input
+
+                id="totalBelanja"
+
+                type="number"
+
+                value="0"
+
+                class="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+
+              />
+
+            </div>
+
+            <div>
+
+              <label class="text-sm mb-2 block">Jarak Pengiriman (km)</label>
+
+              <input
+
+                id="jarak"
+
+                type="number"
+
+                value="0"
+
+                class="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
+
+              />
+
+            </div>
+
+          </div>
+
+          <!-- Toggle -->
+
+          <div class="grid md:grid-cols-2 gap-4 mt-6">
+
+            <div class="border rounded-xl p-4 flex items-center justify-between bg-[#f7f9fc]">
+
+              <div>
+
+                <h3 class="font-medium">Status Member</h3>
+
+                <p class="text-sm text-gray-500">
+
+                  Aktifkan untuk diskon member
+
+                </p>
+
+              </div>
+
+              <label class="relative inline-flex items-center cursor-pointer">
+
+                <input type="checkbox" id="member" class="sr-only peer">
+
+                <div class="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 relative after:content-[''] after:absolute after:left-1 after:top-1 after:bg-white after:w-4 after:h-4 after:rounded-full after:transition-all peer-checked:after:translate-x-5"></div>
+
+              </label>
+
+            </div>
+
+            <div class="border rounded-xl p-4 flex items-center justify-between bg-[#f7f9fc]">
+
+              <div>
+
+                <h3 class="font-medium">Gunakan Voucher</h3>
+
+                <p class="text-sm text-gray-500">
+
+                  Potongan biaya pengiriman
+
+                </p>
+
+              </div>
+
+              <label class="relative inline-flex items-center cursor-pointer">
+
+                <input type="checkbox" id="voucher" class="sr-only peer">
+
+                <div class="w-11 h-6 bg-gray-300 rounded-full peer peer-checked:bg-blue-600 relative after:content-[''] after:absolute after:left-1 after:top-1 after:bg-white after:w-4 after:h-4 after:rounded-full after:transition-all peer-checked:after:translate-x-5"></div>
+
+              </label>
+
+            </div>
+
+          </div>
+
+        </div>
+
+        <!-- Shipping -->
+
+        <div class="mt-8">
+
+          <h2 class="font-semibold mb-4">Metode Pengiriman</h2>
+
+          <div class="grid md:grid-cols-2 gap-4">
+
+            <button
+
+              id="standardBtn"
+
+              onclick="selectShipping('standard')"
+
+              class="shipping-btn border-2 border-blue-600 bg-white rounded-xl p-5 text-left"
+
+            >
+
+              <div class="flex justify-between items-center">
+
+                <div>
+
+                  <h3 class="font-medium">Standard Delivery</h3>
+
+                  <p class="text-sm text-gray-500">2-3 Hari Kerja</p>
+
+                </div>
+
+                <span class="font-semibold">Gratis</span>
+
+              </div>
+
+            </button>
+
+            <button
+
+              id="expressBtn"
+
+              onclick="selectShipping('express')"
+
+              class="shipping-btn border rounded-xl p-5 text-left bg-white"
+
+            >
+
+              <div class="flex justify-between items-center">
+
+                <div>
+
+                  <h3 class="font-medium">Express Delivery</h3>
+
+                  <p class="text-sm text-gray-500">1 Hari Kerja</p>
+
+                </div>
+
+                <span class="font-semibold">Rp 25.000</span>
+
+              </div>
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Summary -->
+
+      <div>
+
+        <div class="bg-[#eef3ff] border rounded-2xl p-6 sticky top-6">
+
+          <h2 class="font-semibold mb-6">Ringkasan Pesanan</h2>
+
+          <div class="space-y-4 text-sm">
+
+            <div class="flex justify-between">
+
+              <span>Subtotal</span>
+
+              <span id="subtotalText">Rp 0</span>
+
+            </div>
+
+            <div class="flex justify-between">
+
+              <span>Biaya Pengiriman</span>
+
+              <span id="shippingText">Rp 0</span>
+
+            </div>
+
+            <div class="flex justify-between text-green-500">
+
+              <span>Diskon Member</span>
+
+              <span id="memberDiscount">- Rp 0</span>
+
+            </div>
+
+            <div class="flex justify-between text-green-500">
+
+              <span>Voucher Potongan</span>
+
+              <span id="voucherDiscount">- Rp 0</span>
+
+            </div>
+
+            <hr>
+
+            <div class="flex justify-between font-semibold text-base">
+
+              <span>Total Tagihan</span>
+
+              <span id="totalText">Rp 0</span>
+
+            </div>
+
+          </div>
+
+          <div class="bg-white border rounded-xl p-4 mt-6 text-sm text-gray-600">
+
+            🔒 Pembayaran Terenkripsi & Aman
+
+          </div>
+
+          <button
+
+            class="w-full bg-blue-600 hover:bg-blue-700 transition text-white py-3 rounded-xl mt-5 font-medium"
+
+          >
+
+            Konfirmasi Pesanan →
+
+          </button>
+
+          <p class="text-xs text-center text-gray-500 mt-4 leading-relaxed">
+
+            Dengan menekan tombol di atas, Anda menyetujui
+
+            <span class="text-blue-600">Syarat & Ketentuan</span> kami.
+
+          </p>
+
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Features -->
+
+    <div class="grid md:grid-cols-3 gap-5 mt-14">
+
+      <div class="bg-white border rounded-xl p-5">
+
+        <h3 class="font-semibold mb-1">100% Secure Payment</h3>
+
+        <p class="text-sm text-gray-500">
+
+          Transaksi dilindungi enkripsi SSL standar industri.
+
+        </p>
+
+      </div>
+
+      <div class="bg-white border rounded-xl p-5">
+
+        <h3 class="font-semibold mb-1">Lacak Pesanan</h3>
+
+        <p class="text-sm text-gray-500">
+
+          Dapatkan notifikasi real-time untuk status pengiriman.
+
+        </p>
+
+      </div>
+
+      <div class="bg-white border rounded-xl p-5">
+
+        <h3 class="font-semibold mb-1">Bantuan 24/7</h3>
+
+        <p class="text-sm text-gray-500">
+
+          Tim bantuan kami siap melayani kapan pun dibutuhkan.
+
+        </p>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+
+  <footer class="bg-[#eef3ff] border-t mt-14">
+
+    <div class="max-w-7xl mx-auto px-6 py-6 flex flex-col md:flex-row justify-between gap-4 text-sm text-gray-500">
+
+      <div>
+
+        <h3 class="font-semibold text-gray-700">SecureCheckout</h3>
+
+        <p>© 2024 SecureCheckout Inc. All rights reserved.</p>
+
+      </div>
+
+      <div class="flex gap-5">
+
+        <a href="#">Privacy Policy</a>
+
+        <a href="#">Terms of Service</a>
+
+        <a href="#">Help Center</a>
+
+        <a href="#">Contact Us</a>
+
+      </div>
+
+    </div>
+
+  </footer>
+
+  <script>
+
+    let shippingCost = 0;
+
+    const totalBelanja = document.getElementById("totalBelanja");
+
+    const member = document.getElementById("member");
+
+    const voucher = document.getElementById("voucher");
+
+    function formatRupiah(number) {
+
+      return "Rp " + number.toLocaleString("id-ID");
+
+    }
+
+    function updateSummary() {
+
+      let subtotal = parseInt(totalBelanja.value) || 0;
+
+      let memberDiscount = member.checked ? subtotal * 0.1 : 0;
+
+      let voucherDiscount = voucher.checked ? 10000 : 0;
+
+      let total =
+
+        subtotal +
+
+        shippingCost -
+
+        memberDiscount -
+
+        voucherDiscount;
+
+      document.getElementById("subtotalText").innerText =
+
+        formatRupiah(subtotal);
+
+      document.getElementById("shippingText").innerText =
+
+        formatRupiah(shippingCost);
+
+      document.getElementById("memberDiscount").innerText =
+
+        "- " + formatRupiah(memberDiscount);
+
+      document.getElementById("voucherDiscount").innerText =
+
+        "- " + formatRupiah(voucherDiscount);
+
+      document.getElementById("totalText").innerText =
+
+        formatRupiah(total);
+
+    }
+
+    function selectShipping(type) {
+
+      const standardBtn = document.getElementById("standardBtn");
+
+      const expressBtn = document.getElementById("expressBtn");
+
+      standardBtn.classList.remove("border-blue-600", "border-2");
+
+      expressBtn.classList.remove("border-blue-600", "border-2");
+
+      if (type === "standard") {
+
+        shippingCost = 0;
+
+        standardBtn.classList.add("border-blue-600", "border-2");
+
+      } else {
+
+        shippingCost = 25000;
+
+        expressBtn.classList.add("border-blue-600", "border-2");
+
+      }
+
+      updateSummary();
+
+    }
+
+    totalBelanja.addEventListener("input", updateSummary);
+
+    member.addEventListener("change", updateSummary);
+
+    voucher.addEventListener("change", updateSummary);
+
+    updateSummary();
+
+  </script>
+
 </body>
 </html>
