@@ -14,19 +14,8 @@
 
     <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
 
-      <h1 class="text-lg font-semibold">UjianTengahSemesterPIPL</h1>
-
-      <nav class="hidden md:flex gap-10 text-sm text-gray-500">
-
-      </nav>
-
-      <div class="flex items-center gap-4 text-xl">
-
-        <span>🛒</span>
-
-        <span>👤</span>
-
-      </div>
+      <h1 class="text-lg font-semibold">Ujian Tengah Semester PIPL</h1>
+      <h1 class="text-lg font-semibold">Ecommerce</h1>
 
     </div>
 
@@ -42,52 +31,6 @@
 
       <div class="lg:col-span-2">
 
-        <!-- Step -->
-
-        <div class="flex items-center gap-4 mb-8 text-sm">
-
-          <div class="flex items-center gap-2">
-
-            <div class="w-7 h-7 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs">
-
-              1
-
-            </div>
-
-            <span class="text-blue-600 font-medium">Pengiriman</span>
-
-          </div>
-
-          <div class="w-14 h-[1px] bg-gray-300"></div>
-
-          <div class="flex items-center gap-2">
-
-            <div class="w-7 h-7 rounded-full border flex items-center justify-center text-xs">
-
-              2
-
-            </div>
-
-            <span>Pembayaran</span>
-
-          </div>
-
-          <div class="w-14 h-[1px] bg-gray-300"></div>
-
-          <div class="flex items-center gap-2">
-
-            <div class="w-7 h-7 rounded-full border flex items-center justify-center text-xs">
-
-              3
-
-            </div>
-
-            <span>Konfirmasi</span>
-
-          </div>
-
-        </div>
-
         <!-- Form -->
 
         <div class="bg-white border rounded-xl p-6">
@@ -101,14 +44,13 @@
               <label class="text-sm mb-2 block">Nama Pelanggan</label>
 
               <input
-
+                id="namaPelanggan"
                 type="text"
-
                 placeholder="Masukkan nama lengkap"
-
                 class="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-
+                autocomplete="off"
               />
+              <p id="errorNama" class="text-red-500 text-xs mt-1 hidden"></p>
 
             </div>
 
@@ -118,11 +60,13 @@
 
               <input
                 id="totalBelanja"
-                type="number"
+                type="text"
+                inputmode="numeric"
                 placeholder="Rp 200.000"
                 class="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-
+                autocomplete="off"
               />
+              <p id="errorBelanja" class="text-red-500 text-xs mt-1 hidden"></p>
 
             </div>
 
@@ -131,16 +75,14 @@
               <label class="text-sm mb-2 block">Jarak Pengiriman (km)</label>
 
               <input
-
                 id="jarak"
-
-                type="number"
-
-                value="0"
-
+                type="text"
+                inputmode="decimal"
+                placeholder="Contoh: 10"
                 class="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
-
+                autocomplete="off"
               />
+              <p id="errorJarak" class="text-red-500 text-xs mt-1 hidden"></p>
 
             </div>
 
@@ -273,18 +215,185 @@
   <script>
 
     let shippingCost = 0;
-
+    const namaPelanggan = document.getElementById("namaPelanggan");
+    const errorNama = document.getElementById("errorNama");
     const totalBelanja = document.getElementById("totalBelanja");
-
     const member = document.getElementById("member");
-
     const voucher = document.getElementById("voucher");
+    const jarak = document.getElementById("jarak");
+    const errorJarak = document.getElementById("errorJarak");
 
-    function formatRupiah(number) {
-
-      return "Rp " + number.toLocaleString("id-ID");
-
+    // Helper: format angka dengan titik ribuan
+    function formatAngkaRupiah(val) {
+      return val.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
     }
+
+    // Helper: hapus semua karakter kecuali angka
+    function onlyNumber(val) {
+      return val.replace(/[^\d]/g, "");
+    }
+
+    function validateNama() {
+      const nama = namaPelanggan.value;
+      // Tidak boleh null atau hanya spasi
+      if (!nama || nama.trim().length === 0) {
+        errorNama.innerText = "Nama wajib diisi dan tidak boleh hanya spasi";
+        errorNama.classList.remove("hidden");
+        return false;
+      }
+      // Minimal 3 karakter
+      if (nama.trim().length < 3) {
+        errorNama.innerText = "Nama minimal 3 karakter";
+        errorNama.classList.remove("hidden");
+        return false;
+      }
+      // Maksimal 50 karakter
+      if (nama.trim().length > 50) {
+        errorNama.innerText = "Nama maksimal 50 karakter";
+        errorNama.classList.remove("hidden");
+        return false;
+      }
+      // Tidak boleh mengandung angka
+      if (/\d/.test(nama)) {
+        errorNama.innerText = "Nama tidak boleh mengandung angka";
+        errorNama.classList.remove("hidden");
+        return false;
+      }
+      // Tidak boleh simbol/karakter aneh
+      if (/[^a-zA-Z\s'.-]/.test(nama)) {
+        errorNama.innerText = "Nama tidak boleh mengandung simbol atau karakter aneh";
+        errorNama.classList.remove("hidden");
+        return false;
+      }
+      // Cegah SQL Injection / Script sederhana
+      const lower = nama.toLowerCase();
+      if (lower.includes("select ") || lower.includes("insert ") || lower.includes("update ") || lower.includes("delete ") || lower.includes("drop ") || lower.includes("--") || lower.includes("<script")) {
+        errorNama.innerText = "Nama tidak boleh mengandung kata atau karakter berbahaya";
+        errorNama.classList.remove("hidden");
+        return false;
+      }
+      errorNama.innerText = "";
+      errorNama.classList.add("hidden");
+      return true;
+    }
+
+    function validateBelanja() {
+      let val = totalBelanja.value;
+      // Tidak boleh kosong
+      if (!val || val.trim().length === 0) {
+        errorBelanja.innerText = "Total belanja wajib diisi";
+        errorBelanja.classList.remove("hidden");
+        return false;
+      }
+      // Tidak boleh huruf, simbol, karakter aneh
+      if (/[^\d.]/.test(val)) {
+        errorBelanja.innerText = "Total belanja hanya boleh angka";
+        errorBelanja.classList.remove("hidden");
+        return false;
+      }
+      // Tidak boleh format salah (misal 10,00,00 atau 1..000)
+      if (/\d+,\d+,/.test(val) || /\.\./.test(val)) {
+        errorBelanja.innerText = "Format angka tidak sesuai";
+        errorBelanja.classList.remove("hidden");
+        return false;
+      }
+      // Hapus titik/karakter selain angka untuk validasi nilai
+      let angka = onlyNumber(val);
+      if (angka.length === 0) {
+        errorBelanja.innerText = "Total belanja wajib diisi";
+        errorBelanja.classList.remove("hidden");
+        return false;
+      }
+      let nominal = parseInt(angka);
+      // Tidak boleh minus
+      if (nominal < 0) {
+        errorBelanja.innerText = "Total belanja tidak boleh minus";
+        errorBelanja.classList.remove("hidden");
+        return false;
+      }
+      // Tidak boleh 0
+      if (nominal === 0) {
+        errorBelanja.innerText = "Total belanja harus lebih dari 0";
+        errorBelanja.classList.remove("hidden");
+        return false;
+      }
+      // Maksimal Rp999.999.999
+      // if (nominal > 999999999) {
+      //   errorBelanja.innerText = "Total belanja maksimal Rp999.999.999";
+      //   errorBelanja.classList.remove("hidden");
+      //   return false;
+      // }
+      errorBelanja.innerText = "";
+      errorBelanja.classList.add("hidden");
+      return true;
+    }
+
+    function validateJarak() {
+      let val = jarak.value;
+      // Tidak boleh kosong
+      if (!val || val.trim().length === 0) {
+        errorJarak.innerText = "Jarak wajib diisi";
+        errorJarak.classList.remove("hidden");
+        return false;
+      }
+      // Tidak boleh huruf, simbol, karakter aneh
+      if (/[^\d.]/.test(val)) {
+        errorJarak.innerText = "Jarak hanya boleh angka atau desimal";
+        errorJarak.classList.remove("hidden");
+        return false;
+      }
+      // Tidak boleh format salah (misal 10..5 atau 1,2,3)
+      if (/\.\./.test(val) || /,/.test(val)) {
+        errorJarak.innerText = "Format angka tidak sesuai";
+        errorJarak.classList.remove("hidden");
+        return false;
+      }
+      // Hapus titik di depan/belakang
+      let angka = val.replace(/^\.|\.$/g, "");
+      if (angka.length === 0) {
+        errorJarak.innerText = "Jarak wajib diisi";
+        errorJarak.classList.remove("hidden");
+        return false;
+      }
+      let nominal = parseFloat(angka);
+      // Tidak boleh minus
+      if (nominal < 0) {
+        errorJarak.innerText = "Jarak tidak boleh negatif";
+        errorJarak.classList.remove("hidden");
+        return false;
+      }
+      // Tidak boleh 0
+      if (nominal === 0) {
+        errorJarak.innerText = "Jarak harus lebih dari 0";
+        errorJarak.classList.remove("hidden");
+        return false;
+      }
+      // Maksimal 100 km
+      if (nominal > 200) {
+        errorJarak.innerText = "Jarak maksimal 100 km";
+        errorJarak.classList.remove("hidden");
+        return false;
+      }
+      errorJarak.innerText = "";
+      errorJarak.classList.add("hidden");
+      return true;
+    }
+
+    namaPelanggan.addEventListener("input", validateNama);
+
+    // Auto-format angka saat input
+    totalBelanja.addEventListener("input", function(e) {
+      let val = totalBelanja.value;
+      // Hapus semua karakter kecuali angka
+      let angka = onlyNumber(val);
+      if (angka.length > 0) {
+        totalBelanja.value = formatAngkaRupiah(angka);
+      } else {
+        totalBelanja.value = "";
+      }
+      validateBelanja();
+      updateSummary();
+    });
 
     function updateSummary() {
 
