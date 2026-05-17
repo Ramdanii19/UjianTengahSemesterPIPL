@@ -76,7 +76,7 @@
 
               <input
                 id="jarak"
-                type="text"
+                type="number"
                 inputmode="decimal"
                 placeholder="Contoh: 10"
                 class="w-full border rounded-lg px-4 py-3 outline-none focus:ring-2 focus:ring-blue-500"
@@ -200,7 +200,7 @@
 
           </div>
 
-          <button class="w-full bg-blue-600 hover:bg-blue-700 transition text-white py-3 rounded-xl mt-5 font-medium">
+          <button id="konfirmasiBtn" class="w-full bg-blue-600 hover:bg-blue-700 transition text-white py-3 rounded-xl mt-5 font-medium disabled:bg-gray-400 disabled:cursor-not-allowed">
 
             Konfirmasi Pesanan →
 
@@ -212,16 +212,53 @@
 
     </div>
 
+    <!-- Modal Success Checkout -->
+    <div id="modalSuccess" class="hidden fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50">
+      <div class="bg-white rounded-2xl p-8 text-center max-w-sm w-full mx-4 shadow-2xl">
+        <!-- Checkmark Animation -->
+        <div class="flex justify-center mb-6">
+          <div class="w-24 h-24 rounded-full bg-green-100 flex items-center justify-center">
+            <svg id="checkmark" class="w-12 h-12 text-green-500 stroke-current" style="stroke-width: 2; fill: none;" viewBox="0 0 24 24">
+              <path d="M20 6L9 17l-5-5" stroke-linecap="round" stroke-linejoin="round" style="stroke-dasharray: 30; stroke-dashoffset: 30; animation: checkAnimation 0.6s ease-out forwards;"></path>
+            </svg>
+          </div>
+        </div>
+        
+        <h3 class="text-2xl font-bold text-gray-800 mb-2">Berhasil!</h3>
+        <p class="text-gray-600 mb-6">Pesanan Anda telah berhasil dikonfirmasi</p>
+        
+        <div class="bg-blue-50 rounded-lg p-4 mb-6 text-left text-sm">
+          <p class="text-gray-700 mb-2"><span class="font-semibold">Nama:</span> <span id="confirmNama" class="text-blue-600"></span></p>
+          <p class="text-gray-700 mb-2"><span class="font-semibold">Total Tagihan:</span> <span id="confirmTotal" class="text-blue-600"></span></p>
+          <p class="text-gray-700"><span class="font-semibold">Status:</span> <span class="text-green-600 font-semibold">Pesanan Dikonfirmasi</span></p>
+        </div>
+        
+        <button id="closeModalBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-medium transition">
+          Tutup
+        </button>
+      </div>
+    </div>
+
+    <style>
+      @keyframes checkAnimation {
+        to {
+          stroke-dashoffset: 0;
+        }
+      }
+    </style>
+
   <script>
 
     let shippingCost = 0;
     const namaPelanggan = document.getElementById("namaPelanggan");
     const errorNama = document.getElementById("errorNama");
     const totalBelanja = document.getElementById("totalBelanja");
+    const errorBelanja = document.getElementById("errorBelanja");
     const member = document.getElementById("member");
     const voucher = document.getElementById("voucher");
     const jarak = document.getElementById("jarak");
     const errorJarak = document.getElementById("errorJarak");
+    const konfirmasiBtn = document.getElementById("konfirmasiBtn");
 
     // Helper: format angka dengan titik ribuan
     function formatAngkaRupiah(val) {
@@ -231,6 +268,22 @@
     // Helper: hapus semua karakter kecuali angka
     function onlyNumber(val) {
       return val.replace(/[^\d]/g, "");
+    }
+
+    // Helper: format angka menjadi format Rupiah (Rp X.XXX)
+    function formatRupiah(val) {
+      return "Rp " + parseInt(val).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    // Helper: update status button konfirmasi
+    function updateButtonStatus() {
+      // Valid jika tidak ada error (error hidden) dan field tidak kosong
+      const namaValid = errorNama.classList.contains("hidden") && namaPelanggan.value.trim().length > 0;
+      const belanjaValid = errorBelanja.classList.contains("hidden") && totalBelanja.value.trim().length > 0;
+      const jarakValid = errorJarak.classList.contains("hidden") && jarak.value.trim().length > 0;
+      
+      // Button enabled hanya jika semua field valid (tidak ada error message yang terlihat)
+      konfirmasiBtn.disabled = !(namaValid && belanjaValid && jarakValid);
     }
 
     function validateNama() {
@@ -274,6 +327,7 @@
       }
       errorNama.innerText = "";
       errorNama.classList.add("hidden");
+      updateButtonStatus();
       return true;
     }
 
@@ -283,18 +337,21 @@
       if (!val || val.trim().length === 0) {
         errorBelanja.innerText = "Total belanja wajib diisi";
         errorBelanja.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       // Tidak boleh huruf, simbol, karakter aneh
       if (/[^\d.]/.test(val)) {
         errorBelanja.innerText = "Total belanja hanya boleh angka";
         errorBelanja.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       // Tidak boleh format salah (misal 10,00,00 atau 1..000)
       if (/\d+,\d+,/.test(val) || /\.\./.test(val)) {
         errorBelanja.innerText = "Format angka tidak sesuai";
         errorBelanja.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       // Hapus titik/karakter selain angka untuk validasi nilai
@@ -302,6 +359,7 @@
       if (angka.length === 0) {
         errorBelanja.innerText = "Total belanja wajib diisi";
         errorBelanja.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       let nominal = parseInt(angka);
@@ -309,12 +367,14 @@
       if (nominal < 0) {
         errorBelanja.innerText = "Total belanja tidak boleh minus";
         errorBelanja.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       // Tidak boleh 0
       if (nominal === 0) {
         errorBelanja.innerText = "Total belanja harus lebih dari 0";
         errorBelanja.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       // Maksimal Rp999.999.999
@@ -325,6 +385,7 @@
       // }
       errorBelanja.innerText = "";
       errorBelanja.classList.add("hidden");
+      updateButtonStatus();
       return true;
     }
 
@@ -334,18 +395,21 @@
       if (!val || val.trim().length === 0) {
         errorJarak.innerText = "Jarak wajib diisi";
         errorJarak.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       // Tidak boleh huruf, simbol, karakter aneh
       if (/[^\d.]/.test(val)) {
         errorJarak.innerText = "Jarak hanya boleh angka atau desimal";
         errorJarak.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       // Tidak boleh format salah (misal 10..5 atau 1,2,3)
       if (/\.\./.test(val) || /,/.test(val)) {
         errorJarak.innerText = "Format angka tidak sesuai";
         errorJarak.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       // Hapus titik di depan/belakang
@@ -353,6 +417,7 @@
       if (angka.length === 0) {
         errorJarak.innerText = "Jarak wajib diisi";
         errorJarak.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       let nominal = parseFloat(angka);
@@ -360,22 +425,26 @@
       if (nominal < 0) {
         errorJarak.innerText = "Jarak tidak boleh negatif";
         errorJarak.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       // Tidak boleh 0
       if (nominal === 0) {
         errorJarak.innerText = "Jarak harus lebih dari 0";
         errorJarak.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       // Maksimal 100 km
       if (nominal > 200) {
         errorJarak.innerText = "Jarak maksimal 100 km";
         errorJarak.classList.remove("hidden");
+        updateButtonStatus();
         return false;
       }
       errorJarak.innerText = "";
       errorJarak.classList.add("hidden");
+      updateButtonStatus();
       return true;
     }
 
@@ -396,43 +465,28 @@
     });
 
     function updateSummary() {
+      // Subtotal dari Total Belanja
+      let subtotal = parseInt(onlyNumber(totalBelanja.value)) || 0;
 
-      let subtotal = parseInt(totalBelanja.value) || 0;
+      // Biaya Pengiriman = Jarak × 5000
+      let jarakValue = parseFloat(jarak.value.replace(/[^\d.]/g, "")) || 0;
+      let shippingCost = jarakValue * 5000;
 
-      let memberDiscount = member.checked ? subtotal * 0.1 : 0;
+      // Diskon Member (10% dari Subtotal jika aktif)
+      let memberDiscount = member.checked ? Math.floor(subtotal * 0.1) : 0;
 
-      let voucherDiscount = voucher.checked ? 10000 : 0;
+      // Voucher (5% dari Subtotal + Biaya Pengiriman jika aktif)
+      let subtotalWithShipping = subtotal + shippingCost;
+      let voucherDiscount = voucher.checked ? Math.floor(subtotalWithShipping * 0.05) : 0;
 
-      let total =
+      // Total Tagihan = Subtotal + Biaya Pengiriman - Diskon Member - Voucher
+      let total = subtotal + shippingCost - memberDiscount - voucherDiscount;
 
-        subtotal +
-
-        shippingCost -
-
-        memberDiscount -
-
-        voucherDiscount;
-
-      document.getElementById("subtotalText").innerText =
-
-        formatRupiah(subtotal);
-
-      document.getElementById("shippingText").innerText =
-
-        formatRupiah(shippingCost);
-
-      document.getElementById("memberDiscount").innerText =
-
-        "- " + formatRupiah(memberDiscount);
-
-      document.getElementById("voucherDiscount").innerText =
-
-        "- " + formatRupiah(voucherDiscount);
-
-      document.getElementById("totalText").innerText =
-
-        formatRupiah(total);
-
+      document.getElementById("subtotalText").innerText = formatRupiah(subtotal);
+      document.getElementById("shippingText").innerText = formatRupiah(shippingCost);
+      document.getElementById("memberDiscount").innerText = "- " + formatRupiah(memberDiscount);
+      document.getElementById("voucherDiscount").innerText = "- " + formatRupiah(voucherDiscount);
+      document.getElementById("totalText").innerText = formatRupiah(total);
     }
 
     totalBelanja.addEventListener("input", updateSummary);
@@ -441,7 +495,47 @@
 
     voucher.addEventListener("change", updateSummary);
 
+    // Auto-format jarak dan update summary
+    jarak.addEventListener("input", function(e) {
+      validateJarak();
+      updateSummary();
+    });
+
     updateSummary();
+    updateButtonStatus();
+
+    // Event listener untuk button konfirmasi
+    konfirmasiBtn.addEventListener("click", function() {
+      // Validasi sekali lagi sebelum submit
+      if (validateNama() && validateBelanja() && validateJarak()) {
+        // Ambil total tagihan dari display
+        const totalTagihan = document.getElementById("totalText").innerText;
+        
+        // Isi detail di modal
+        document.getElementById("confirmNama").innerText = namaPelanggan.value;
+        document.getElementById("confirmTotal").innerText = totalTagihan;
+        
+        // Tampilkan modal
+        document.getElementById("modalSuccess").classList.remove("hidden");
+      }
+    });
+
+    // Event listener untuk close modal
+    document.getElementById("closeModalBtn").addEventListener("click", function() {
+      document.getElementById("modalSuccess").classList.add("hidden");
+      
+      // Reset form
+      namaPelanggan.value = "";
+      totalBelanja.value = "";
+      jarak.value = "";
+      member.checked = false;
+      voucher.checked = false;
+      errorNama.classList.add("hidden");
+      errorBelanja.classList.add("hidden");
+      errorJarak.classList.add("hidden");
+      updateSummary();
+      updateButtonStatus();
+    });
 
   </script>
 
