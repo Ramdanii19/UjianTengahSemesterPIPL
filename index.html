@@ -377,12 +377,13 @@
         updateButtonStatus();
         return false;
       }
-      // Maksimal Rp999.999.999
-      // if (nominal > 999999999) {
-      //   errorBelanja.innerText = "Total belanja maksimal Rp999.999.999";
-      //   errorBelanja.classList.remove("hidden");
-      //   return false;
-      // }
+      // Maksimal 100 Milyar (100.000.000.000)
+      if (nominal > 100000000000) {
+        errorBelanja.innerText = "Total belanja maksimal Rp100.000.000.000";
+        errorBelanja.classList.remove("hidden");
+        updateButtonStatus();
+        return false;
+      }
       errorBelanja.innerText = "";
       errorBelanja.classList.add("hidden");
       updateButtonStatus();
